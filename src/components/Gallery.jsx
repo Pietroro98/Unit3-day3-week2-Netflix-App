@@ -1,6 +1,5 @@
-import React, { Component } from "react";
-import { Carousel, Container, Row, Col, Spinner, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import React, { Component } from 'react';
+import { Carousel, Container, Row, Col, Spinner, Alert } from 'react-bootstrap';
 
 class Gallery extends Component {
   state = {
@@ -14,9 +13,10 @@ class Gallery extends Component {
   }
 
   fetchMovies = async () => {
-    const apiKey = "662fb97c";
-    const url = `http://www.omdbapi.com/?s=Harry+Potter&apikey=${apiKey}`;
-
+    const { title } = this.props;
+    const apiKey = "662fb97c"; 
+    const url = `http://www.omdbapi.com/?apikey=${apiKey}&s=${title}`;
+    
     try {
       const response = await fetch(url);
       const data = await response.json();
@@ -41,15 +41,10 @@ class Gallery extends Component {
     }
 
     return (
-      <Container fluid className="w-75 gallerys">
+      <Container fluid className='w-75 gallerys'>
         <h4>{this.props.title}</h4>
         {isLoading && <Spinner animation="border" variant="info" />}
-        {isError && (
-          <Alert variant="danger">
-            Ops! Qualcosa è andato storto
-            <i className="bi bi-exclamation-triangle"></i>
-          </Alert>
-        )}
+        {isError && <Alert variant="danger">Ops! Qualcosa è andato storto</Alert>}
         <Carousel indicators={false} controls={true} className="mb-5">
           {groupedMovies.map((group, index) => (
             <Carousel.Item key={index} className="mt-2">
@@ -57,13 +52,11 @@ class Gallery extends Component {
                 <Row>
                   {group.map((movie, idx) => (
                     <Col xs={12} md={2} className="mb-3 p-1" key={idx}>
-                      <Link to={`/movie-details/${movie.imdbID}`}>
-                        <img
-                          src={movie.Poster}
-                          className="d-block w-100"
-                          alt={movie.Title}
-                        />
-                      </Link>
+                      <img
+                        src={movie.Poster}
+                        className="d-block w-100"
+                        alt={movie.Title}
+                      />
                     </Col>
                   ))}
                 </Row>

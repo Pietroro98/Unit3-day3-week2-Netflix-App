@@ -1,49 +1,75 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import Gallery from './Gallery'; 
 
+const Homepage = () => {
+  const [actionMovies, setActionMovies] = useState([]);
+  const [horrorMovies, setHorrorMovies] = useState([]);
+  const [fantasyMovies, setFantasyMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
-import {
-  Container,
-  Row,
-  Col,
-  Dropdown,
-  ButtonGroup,
-  Button,
-} from "react-bootstrap";
+  useEffect(() => {
+    const fetchMovies = async () => {
+      const apiKey = "662fb97c"; 
 
-const Homepage = function () {
+      try {
+        
+        const actionResponse = await fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=Action`);
+        const actionData = await actionResponse.json();
+        if (actionData.Response === 'True') {
+          setActionMovies(actionData.Search);
+        } else {
+          setIsError(true);
+        }
+
+       
+        const horrorResponse = await fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=Horror`);
+        const horrorData = await horrorResponse.json();
+        if (horrorData.Response === 'True') {
+          setHorrorMovies(horrorData.Search);
+        } else {
+          setIsError(true);
+        }
+
+        
+        const fantasyResponse = await fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=Fantasy`);
+        const fantasyData = await fantasyResponse.json();
+        if (fantasyData.Response === 'True') {
+          setFantasyMovies(fantasyData.Search);
+        } else {
+          setIsError(true);
+        }
+
+      } catch (error) {
+        console.error("Errore nel fetch dei dati:", error);
+        setIsError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>; 
+  }
+
+  if (isError) {
+    return <div>Error loading movies</div>; 
+  }
+
   return (
-    <Container fluid className="homepage">
-      <Row className="d-flex">
-        <Col className="d-flex align-items-center">
-          <h2 className="pe-4">TV Shows</h2>
-          <Dropdown>
-            <Dropdown.Toggle
-              variant="outline-secondary"
-              id="dropdown-basic"
-              className="border border-1 border-secondary over"
-            >
-              Genres
-            </Dropdown.Toggle>
+    <div>
+      <h2>Action Movies</h2>
+      <Gallery title="Action" movies={actionMovies} />
 
-            <Dropdown.Menu>
-              <Dropdown.Item href="#">Action</Dropdown.Item>
-              <Dropdown.Item href="#">Horror</Dropdown.Item>
-              <Dropdown.Item href="#">Fantasy</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </Col>
-        <Col className="d-flex justify-content-end align-items-center">
-          <ButtonGroup aria-label="Basic example">
-            <Button variant="outline-secondary" className="rounded-1 over">
-              <i className="bi bi-text-left"></i>
-            </Button>
-            <Button variant="outline-secondary" className="rounded-1 over">
-              <i className="bi bi-grid"></i>
-            </Button>
-          </ButtonGroup>
-        </Col>
-      </Row>
-    </Container>
+      <h2>Horror Movies</h2>
+      <Gallery title="Horror" movies={horrorMovies} />
+
+      <h2>Fantasy Movies</h2>
+      <Gallery title="Fantasy" movies={fantasyMovies} />
+    </div>
   );
 };
 
